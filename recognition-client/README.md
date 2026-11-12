@@ -1,10 +1,7 @@
-# Manual Recognition Client
+# Recognition test client
 
-This module is a separate APK with its own UID. It has no dependency on the
-Sorbisch application code and accesses recognition only through Android's
-`SpeechRecognizer` API. It is a development tool, not part of the end-user APK.
-
-Build and install on a connected Android device or emulator, alongside Sorbisch:
+A second, minimal app that calls Diktuj's recognition service through Android's
+`SpeechRecognizer`, the way any other app would. It is only for testing.
 
 ```bash
 ./gradlew :recognition-client:assembleDebug
@@ -12,18 +9,14 @@ adb install -r recognition-client/build/outputs/apk/debug/recognition-client-deb
 adb shell am start -n de.adrianzimmermann.speechclient/.MainActivity
 ```
 
-The test app has buttons for explicit and default service selection.
-It needs microphone permission and a reachable recognizer configured in Sorbisch.
+Diktuj has to be installed and set up as well. **Use Diktuj service** addresses
+the service directly, **Use Android default** uses whatever recognizer the
+system has selected.
 
-On the Android 14 demo emulator, the default provider can be selected for testing
-with:
+To make Diktuj the system default on an emulator (note the old value first with
+`settings get` and put it back afterwards):
 
 ```bash
 adb shell settings put secure voice_recognition_service \
-  de.adrianzimmermann.sorbianonlinespeech/de.adrianzimmermann.sorbianonlinespeech.OnlineRecognitionService
+  de.serbskilud.diktuj/de.adrianzimmermann.sorbianonlinespeech.OnlineRecognitionService
 ```
-
-Record the previous value first with `adb shell settings get secure voice_recognition_service`,
-and restore it afterward. The explicit-selection
-button does not require changing the system default. Vendor settings and apps
-that explicitly choose another recognizer are unaffected by the default setting.

@@ -22,12 +22,12 @@ jobs:
           java-version: '17'
       - name: Install Android SDK packages
         run: |
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-34" "build-tools;35.0.0"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-34" "platforms;android-36" "build-tools;35.0.0"
       - name: Build and lint
         run: ./gradlew --no-daemon :app:assembleDebug :app:lintDebug :app:assembleDebugAndroidTest :recognition-client:assembleDebug
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
-          name: sorbisch-debug
+          name: diktuj-debug
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30

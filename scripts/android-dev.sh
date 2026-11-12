@@ -3,7 +3,8 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
-PACKAGE=de.adrianzimmermann.sorbianonlinespeech
+PACKAGE=de.serbskilud.diktuj
+JAVA_PACKAGE=de.adrianzimmermann.sorbianonlinespeech
 APK=app/build/outputs/apk/debug/app-debug.apk
 SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
 ADB="${SDK:+$SDK/platform-tools/adb}"
@@ -35,7 +36,7 @@ require_device() {
 }
 
 open_app() {
-    "$ADB" shell am start -n "$PACKAGE/.MainActivity"
+    "$ADB" shell am start -n "$PACKAGE/$JAVA_PACKAGE.HomeActivity"
 }
 
 install_app() {
@@ -57,7 +58,7 @@ case "${1:-help}" in
     test-tts)
         require_device
         ./gradlew :app:connectedDebugAndroidTest \
-            -Pandroid.testInstrumentationRunnerArguments.class="$PACKAGE.BamborakIntegrationTest"
+            -Pandroid.testInstrumentationRunnerArguments.class="$JAVA_PACKAGE.BamborakIntegrationTest"
         ;;
     devices) "$ADB" devices ;;
     avds) "$EMULATOR" -list-avds ;;
