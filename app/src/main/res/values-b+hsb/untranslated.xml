@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <!-- Still German. Move each string to its file once it is translated. -->
+    <string name="diagnostics_title">Expertenoptionen: Diagnose</string>
+    <string name="diagnostics_arm">Nächstes Diktat auf dem Server aufzeichnen</string>
+    <string name="diagnostics_disarm">Vorgemerkte Diagnoseaufnahme ausschalten</string>
+    <string name="diagnostics_enable">Einmal aktivieren</string>
+    <string name="diagnostics_consent">Mit dieser freiwilligen Funktion bittest du den Sprachserver, dein nächstes Diktat zur Fehlersuche als Audio zu speichern. Bitte verwende dafür einen Testsatz ohne persönliche oder vertrauliche Angaben.\n\nDiktuj kann nicht prüfen, ob und wie lange die Aufnahme auf dem Server gespeichert wird. Du kannst sie hier auch nicht löschen. Auf deinem Gerät wird keine Audiodatei gespeichert.\n\nDie Freigabe gilt einmalig für das nächste Diktat, auch über die Tastatur oder eine andere App. Starte es innerhalb von zehn Minuten. Ein bereits laufendes Diktat ist nicht betroffen. Wird Diktuj vollständig beendet, verfällt die Freigabe.</string>
+    <string name="diagnostics_armed">Serveraufnahme für das nächste Diktat vorgemerkt. Bitte innerhalb von zehn Minuten starten.</string>
+    <string name="diagnostics_email">Liste prüfen und E-Mail vorbereiten</string>
+    <string name="diagnostics_clear">Lokale Liste löschen</string>
+    <string name="diagnostics_clear_confirm">Lokale Liste löschen? Aufnahmen auf dem Server werden dadurch nicht gelöscht.</string>
+    <string name="diagnostics_empty">Die lokale Liste enthält noch keine Diagnosediktate.</string>
+    <string name="diagnostics_no_mail">Keine E-Mail-App verfügbar. Bitte eine E-Mail-App installieren oder aktivieren.</string>
+    <string name="diagnostics_report">Diktuj %1$s: Diagnosediktate\n\nDiese Liste hilft dem Support, deine Testdiktate auf dem Server zu finden. Sie enthält bis zu 50 Einträge mit Zeitpunkt (UTC), Server, Sprache und Abtastrate, aber keine Aufnahmen oder erkannten Texte.\n\nDer Zeitpunkt bezieht sich auf das erste zum Versand vorgemerkte Audiopaket. Für diese Diktate wurde eine Aufnahme auf dem Server angefordert. Ob sie tatsächlich gespeichert wurde, kann Diktuj nicht bestätigen.</string>
+    <string name="ime_enter">Eingabetaste</string>
+    <string name="setup_input_only">Nur Spracheingabe verwenden</string>
+    <string name="ime_cancel_connecting">Verbindung wird aufgebaut. Abbrechen</string>
+    <string name="setup_close_and_use">Schließen und Diktuj verwenden</string>
+    <string name="setup_main_menu">Zum Hauptmenü von Diktuj</string>
+    <string name="setup_use_keyboard_help">Du kannst Diktuj jetzt schließen. Öffne zum Diktieren ein Textfeld in einer anderen App und wähle die Diktuj-Tastatur. Tippe auf das Mikrofon und sprich, sobald das rote Stopp-Quadrat erscheint. Tippe darauf, um die Aufnahme zu beenden. Noch offene Einrichtungsschritte stehen unten.</string>
+    <string name="setup_use_output_help">Du kannst Diktuj jetzt schließen. Nutze zum Vorlesen den eingerichteten Bedienungshilfen-Kurzbefehl oder eine App, die Androids Sprachausgabe verwendet. Noch offene Einrichtungsschritte stehen unten.</string>
+    <string name="ime_insert_failed">Der Text konnte nicht eingefügt werden. Bitte das Textfeld erneut auswählen. Dein Diktat bleibt hier sichtbar.</string>
+    <string name="recognizer_secure_connection_failed">Keine sichere Verbindung möglich. Bitte Gerätedatum und Serveradresse prüfen. Falls das Problem bleibt, den Betreiber kontaktieren.</string>
+    <string name="recognizer_access_denied">Der Server hat den Zugriff abgelehnt. Bitte Serveradresse prüfen oder den Betreiber kontaktieren.</string>
+    <string name="recognizer_server_unavailable">Der Server ist gerade ausgelastet oder nicht verfügbar. Bitte später erneut versuchen.</string>
+</resources>

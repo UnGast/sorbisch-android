@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <!-- Sotra machine translation draft; requires Upper Sorbian review. -->
+    <string name="privacy_title">datowy škit</string>
+    <string name="imprint_title">impresum</string>
+    <string name="licenses_title">open source licency</string>
+    <string name="information_unavailable">Tute informacije njejsu runje přistupne. Prošu začitaj tutu stronu znowa.</string>
+</resources>
