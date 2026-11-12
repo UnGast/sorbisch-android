@@ -52,7 +52,7 @@ public class SorbianTtsService extends TextToSpeechService {
         return currentLanguage.clone();
     }
 
-    /** Downloads the complete WAV before delivering audio; rate and pitch are not forwarded. */
+    // The server has no rate or pitch parameters, so those request settings are ignored.
     @Override
     protected void onSynthesizeText(SynthesisRequest request, SynthesisCallback callback) {
         stopped = false;
@@ -64,10 +64,10 @@ public class SorbianTtsService extends TextToSpeechService {
         }
         Request networkRequest;
         try {
-            // Accessibility services usually request the device locale (for example de-DE).
-            // The configured backend voice remains Sorbian regardless of that system hint.
+            // Select to Speak and similar services ask for the device locale (e.g. de-DE),
+            // so the request language is ignored and the configured one is used.
             networkRequest = ExternalTtsClient.request(
-                    this, endpoint, text, SpeechSettings.language(this));
+                    this, endpoint, text, SpeechSettings.ttsLanguage(this));
         } catch (IllegalArgumentException e) {
             finishError(callback, TextToSpeech.ERROR_INVALID_REQUEST);
             return;
@@ -102,7 +102,6 @@ public class SorbianTtsService extends TextToSpeechService {
         }
     }
 
-    /** Chunks already downloaded PCM to Android's buffer limit; this is not server audio streaming. */
     private void stream(PcmWav.Audio audio, SynthesisCallback callback) {
         if (callback.start(audio.sampleRate, audio.audioFormat, audio.channelCount) != TextToSpeech.SUCCESS) {
             finishError(callback, TextToSpeech.ERROR_OUTPUT);
@@ -122,12 +121,15 @@ public class SorbianTtsService extends TextToSpeechService {
     private static void finishError(SynthesisCallback callback, int errorCode) {
         if (!callback.hasFinished()) {
             callback.error(errorCode);
+            callback.done();
         }
     }
 
     static boolean isSystemLanguageSupported(String language) {
-        return "hsb".equals(language) || "dsb".equals(language)
-                || "deu".equals(language) || "de".equals(language)
+        for (String available : SpeechSettings.availableTtsLanguages()) {
+            if (available.equals(language)) return true;
+        }
+        return "deu".equals(language) || "de".equals(language)
                 || "eng".equals(language) || "en".equals(language);
     }
 }

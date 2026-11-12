@@ -1,19 +1,19 @@
 package de.adrianzimmermann.sorbianonlinespeech;
 
 interface RecognitionListener {
-    /** The WebSocket is open and its configuration has been queued. */
+    /** Connected to the server. */
     void onReady();
 
-    /** AudioRecord has started; this does not mean speech or a valid host signal was detected. */
+    /** Recording has started. */
     void onSpeechStart();
 
-    /** A server partial for display, or a final transcript for insertion/delivery. */
+    /** A partial or final transcript, see {@link RecognitionResult#partial}. */
     void onResult(RecognitionResult result);
 
     void onNoSpeech();
 
     void onError(String message);
 
-    /** Normal session closure, possibly after a final result; closure alone is not a transcript. */
+    /** The session ended without an error. */
     void onComplete();
 }

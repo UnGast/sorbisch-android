@@ -29,6 +29,7 @@ final class TtsPlayer implements TextToSpeech.OnInitListener {
             .readTimeout(60, TimeUnit.SECONDS).build();
     private TextToSpeech textToSpeech;
     private boolean engineReady;
+    private boolean engineFailed;
     private boolean shutdown;
     private MediaPlayer mediaPlayer;
     private Call externalCall;
@@ -47,6 +48,7 @@ final class TtsPlayer implements TextToSpeech.OnInitListener {
         }
         engineReady = status == TextToSpeech.SUCCESS;
         if (!engineReady) {
+            engineFailed = true;
             pendingText = null;
             pendingLanguage = null;
             listener.onError(text(R.string.tts_unavailable));
@@ -61,7 +63,7 @@ final class TtsPlayer implements TextToSpeech.OnInitListener {
         }
     }
 
-    /** Selects this app's Android engine explicitly; retains the latest text while it initializes. */
+    /** Speaks through this app's Android TTS engine, whatever the system default is. */
     synchronized void speakWithEngine(String text, String language) {
         if (shutdown) {
             return;
@@ -71,6 +73,12 @@ final class TtsPlayer implements TextToSpeech.OnInitListener {
             return;
         }
         stop();
+        if (engineFailed && textToSpeech != null) {
+            // Try again with a new engine instance.
+            textToSpeech.shutdown();
+            textToSpeech = null;
+        }
+        engineFailed = false;
         if (textToSpeech == null) {
             pendingText = text;
             pendingLanguage = language;
@@ -94,7 +102,7 @@ final class TtsPlayer implements TextToSpeech.OnInitListener {
         textToSpeech.speak(text.trim(), TextToSpeech.QUEUE_FLUSH, null, "sorbian-online-speech-tts");
     }
 
-    /** Bypasses Android's TTS engine to test the server directly; downloads audio before playback. */
+    /** Calls the TTS server directly, without the Android engine in between. */
     synchronized void speakExternal(String text, String language, String endpointUrl) {
         if (shutdown) {
             return;
@@ -130,15 +138,15 @@ final class TtsPlayer implements TextToSpeech.OnInitListener {
 
             @Override
             public void onResponse(Call call, Response response) {
-                try (Response closeable = response) {
-                    byte[] audio = ExternalTtsClient.readAudio(response);
+                try (Response body = response) {
+                    byte[] audio = ExternalTtsClient.readAudio(body);
                     synchronized (TtsPlayer.this) {
                         if (call == externalCall && !call.isCanceled()) {
                             playAudio(audio);
                             externalCall = null;
                         }
                     }
-                } catch (IOException e) {
+                } catch (IOException | RuntimeException e) {
                     synchronized (TtsPlayer.this) {
                         if (call == externalCall && !call.isCanceled()) {
                             externalCall = null;
@@ -242,5 +250,4 @@ final class TtsPlayer implements TextToSpeech.OnInitListener {
     private String text(int resourceId, Object... arguments) {
         return context.getString(resourceId, arguments);
     }
-
 }

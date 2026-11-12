@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:fitsSystemWindows="true">
+    <Button android:id="@+id/information_back" style="@style/Button.Back"
+        android:layout_marginStart="12dp" android:text="@string/setup_back" />
+    <TextView android:id="@+id/information_title" style="@style/PageTitle"
+        android:paddingStart="20dp" android:paddingEnd="20dp" />
+    <WebView android:id="@+id/license_webview" android:layout_width="match_parent"
+        android:layout_height="0dp" android:layout_weight="1" android:visibility="gone" />
+    <ScrollView android:id="@+id/information_scroll" android:layout_width="match_parent" android:layout_height="0dp"
+        android:layout_weight="1" android:fillViewport="true"
+        android:paddingStart="20dp" android:paddingEnd="20dp" android:scrollbarStyle="outsideOverlay">
+        <TextView android:id="@+id/information_body" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="16sp"
+            android:lineSpacingExtra="5dp" android:textColor="@color/text_primary"
+            android:textColorLink="@color/primary" android:paddingTop="8dp" android:paddingBottom="32dp"
+            android:breakStrategy="high_quality" android:hyphenationFrequency="normal" />
+    </ScrollView>
+</LinearLayout>

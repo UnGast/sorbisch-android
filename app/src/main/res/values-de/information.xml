@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="privacy_title">Datenschutz</string>
+    <string name="imprint_title">Impressum</string>
+    <string name="licenses_title">Open-Source-Lizenzen</string>
+    <string name="information_unavailable">Diese Informationen konnten nicht geladen werden. Bitte öffne diese Seite erneut.</string>
+</resources>

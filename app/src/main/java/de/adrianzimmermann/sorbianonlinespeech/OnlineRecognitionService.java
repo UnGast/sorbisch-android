@@ -22,14 +22,16 @@ public class OnlineRecognitionService extends RecognitionService {
         activeCallback = callback;
         speechEnded = false;
         Context recordingContext = this;
-        // Preserve the calling app's permission attribution through to AudioRecord on Android 12+.
+        // Android 12+: record on behalf of the calling app, so the microphone use is attributed to it.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             recordingContext = createContext(new ContextParams.Builder()
                     .setNextAttributionSource(callback.getCallingAttributionSource())
                     .build());
         }
-        session = new OnlineSpeechSession(recordingContext, SpeechSettings.serverUrl(this),
-                SpeechSettings.languageFromIntent(this, intent), new RecognitionListener() {
+        String language = SpeechSettings.languageFromIntent(this, intent);
+        // Never continuous: callers expect a result without having to call stopListening().
+        session = new OnlineSpeechSession(recordingContext, SpeechSettings.serverUrl(this, language),
+                language, false, new RecognitionListener() {
                     @Override
                     public void onReady() {
                         send(callback, () -> callback.readyForSpeech(new Bundle()));
@@ -63,7 +65,7 @@ public class OnlineRecognitionService extends RecognitionService {
 
                     @Override
                     public void onComplete() {
-                        // A socket can close without delivering a final transcript.
+                        // Closed without a final result.
                         fail(callback, SpeechRecognizer.ERROR_NO_MATCH);
                     }
                 });
@@ -91,7 +93,6 @@ public class OnlineRecognitionService extends RecognitionService {
         super.onDestroy();
     }
 
-    /** Reports capture ending once, before final results; it is not a terminal result itself. */
     private void endSpeech(Callback callback) {
         if (callback == activeCallback && !speechEnded) {
             speechEnded = true;
@@ -119,7 +120,7 @@ public class OnlineRecognitionService extends RecognitionService {
         }
     }
 
-    /** Drops events from replaced/finished clients and cancels work if the remote client dies. */
+    // Ignores callbacks of earlier clients. A RemoteException means the client is gone.
     private void send(Callback callback, CallbackAction action) {
         if (callback != activeCallback) {
             return;

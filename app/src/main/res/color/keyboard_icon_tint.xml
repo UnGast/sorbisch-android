@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Disabled keys (Enter/Search while dictating) are visibly paler. Use opaque colors:
+     translucent tints render too dark on vector icons. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_enabled="false" android:color="#B4BBC5" />
+    <item android:color="@color/keyboard_icon" />
+</selector>

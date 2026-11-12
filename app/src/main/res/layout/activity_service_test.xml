@@ -2,32 +2,30 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp">
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/recognition_service_test"
-        android:textSize="22sp" />
+        style="@style/PageTitle"
+        android:text="@string/recognition_service_test" />
 
     <Button
         android:id="@+id/start_service_test"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/Button.Primary"
         android:text="@string/start_service_test" />
 
     <Button
         android:id="@+id/stop_service_test"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/Button.Tonal"
         android:text="@string/stop" />
 
     <TextView
         android:id="@+id/service_status"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="12dp"
+        style="@style/SupportingText"
         android:paddingBottom="8dp"
         android:text="@string/status_idle" />
 

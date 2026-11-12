@@ -4,14 +4,14 @@ import android.content.Context;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 final class ExternalTtsClient {
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
@@ -19,21 +19,17 @@ final class ExternalTtsClient {
     private ExternalTtsClient() {
     }
 
-    static Request request(String endpointUrl, String text, String language) {
-        return request(endpointUrl, text, language, SpeechSettings.TTS_SIMPLE, "");
-    }
-
-    /** Uses the saved protocol and speaker ID, rejecting incomplete Bamborak configuration early. */
+    /** Builds the request from the saved settings for this language. */
     static Request request(Context context, String endpointUrl, String text, String language) {
-        if (SpeechSettings.TTS_BAMBORAK.equals(SpeechSettings.ttsProtocol(context))
-                && SpeechSettings.ttsSpeakerId(context).trim().isEmpty()) {
+        if (SpeechSettings.TTS_BAMBORAK.equals(SpeechSettings.ttsProtocol(context, language))
+                && SpeechSettings.ttsSpeakerId(context, language).trim().isEmpty()) {
             throw new IllegalArgumentException(context.getString(R.string.tts_speaker_required));
         }
-        return request(endpointUrl, text, language, SpeechSettings.ttsProtocol(context),
-                SpeechSettings.ttsSpeakerId(context));
+        return request(endpointUrl, text, language, SpeechSettings.ttsProtocol(context, language),
+                SpeechSettings.ttsSpeakerId(context, language));
     }
 
-    /** Bamborak selects language through its speaker ID; simple mode sends a language code instead. */
+    // Bamborak picks the language through the speaker, so it gets no language field.
     static Request request(String endpointUrl, String text, String language,
                            String protocol, String speakerId) {
         JSONObject payload = new JSONObject();
@@ -59,10 +55,7 @@ final class ExternalTtsClient {
                 .build();
     }
 
-    /**
-     * Consumes the full response body and rejects HTTP/JSON errors or empty data.
-     * Returned bytes still require decoding; a successful HTTP response alone is not valid WAV.
-     */
+    /** Returns the response body, or throws if the server reported an error. */
     static byte[] readAudio(Response response) throws IOException {
         ResponseBody body = response.body();
         if (body == null) {

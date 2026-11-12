@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ime_cancel_connecting">Verbindung wird aufgebaut. Abbrechen</string>
+    <string name="setup_close_and_use">Schließen und Diktuj verwenden</string>
+    <string name="setup_main_menu">Zum Hauptmenü von Diktuj</string>
+    <string name="setup_use_keyboard_help">Du kannst Diktuj jetzt schließen. Öffne zum Diktieren ein Textfeld in einer anderen App und wähle die Diktuj-Tastatur. Tippe auf das Mikrofon und sprich, sobald das rote Stopp-Quadrat erscheint. Tippe darauf, um die Aufnahme zu beenden. Noch offene Einrichtungsschritte stehen unten.</string>
+    <string name="setup_use_output_help">Du kannst Diktuj jetzt schließen. Nutze zum Vorlesen den eingerichteten Bedienungshilfen-Kurzbefehl oder eine App, die Androids Sprachausgabe verwendet. Noch offene Einrichtungsschritte stehen unten.</string>
+    <string name="ime_insert_failed">Der Text konnte nicht eingefügt werden. Bitte das Textfeld erneut auswählen. Dein Diktat bleibt hier sichtbar.</string>
+    <string name="recognizer_secure_connection_failed">Keine sichere Verbindung möglich. Bitte Gerätedatum und Serveradresse prüfen. Falls das Problem bleibt, den Betreiber kontaktieren.</string>
+    <string name="recognizer_access_denied">Der Server hat den Zugriff abgelehnt. Bitte Serveradresse prüfen oder den Betreiber kontaktieren.</string>
+    <string name="recognizer_server_unavailable">Der Server ist gerade ausgelastet oder nicht verfügbar. Bitte später erneut versuchen.</string>
+</resources>

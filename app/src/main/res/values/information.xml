@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="privacy_title">Privacy</string>
+    <string name="imprint_title">Imprint</string>
+    <string name="licenses_title">Open-source licenses</string>
+    <string name="information_unavailable">This information could not be loaded. Please reopen this page.</string>
+</resources>

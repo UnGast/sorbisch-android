@@ -3,8 +3,8 @@
      Source: https://github.com/google/material-design-icons/blob/master/src/hardware/keyboard/materialicons/24px.svg
      License: third_party/material-icons/LICENSE -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="28dp"
-    android:height="28dp"
+    android:width="24dp"
+    android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
     <path

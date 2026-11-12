@@ -15,6 +15,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import javax.net.ssl.SSLException;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -26,6 +27,7 @@ import okio.ByteString;
 final class OnlineSpeechSession {
     private static final int AUDIO_FRAME_DURATION_MS = 40;
     private static final long MAX_WEBSOCKET_QUEUE_BYTES = 256 * 1024;
+    private static final long FINAL_RESULT_TIMEOUT_MS = 120_000;
     private static final OkHttpClient HTTP_CLIENT = new OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
             .writeTimeout(10, TimeUnit.SECONDS)
@@ -49,6 +51,7 @@ final class OnlineSpeechSession {
     private volatile boolean connected;
     private volatile WebSocket webSocket;
     private volatile AudioRecord recorder;
+    private boolean audioLog;
     private final Runnable finalResultTimeout = () -> {
         if (running.get() && stopping.get()) {
             finishWithError(text(R.string.recognizer_no_final_result));
@@ -56,16 +59,20 @@ final class OnlineSpeechSession {
     };
 
     OnlineSpeechSession(Context context, String serverUrl, String language, RecognitionListener listener) {
-        // RecognitionService supplies the caller's microphone attribution here.
+        this(context, serverUrl, language, SpeechSettings.continuousRecognition(context), listener);
+    }
+
+    OnlineSpeechSession(Context context, String serverUrl, String language, boolean continuous,
+                        RecognitionListener listener) {
+        // RecognitionService passes a context that carries the calling app's microphone attribution.
         this.context = context;
-        this.serverUrl = SpeechSettings.sanitizeServerUrl(serverUrl);
         this.language = SpeechSettings.normalizeLanguage(language);
+        this.serverUrl = SpeechSettings.sanitizeServerUrl(serverUrl, this.language);
         this.sampleRate = SpeechSettings.sampleRate(context);
-        this.transcript = new RecognitionTranscript(SpeechSettings.continuousRecognition(context));
+        this.transcript = new RecognitionTranscript(continuous);
         this.listener = listener;
     }
 
-    /** Connects and sends configuration before opening the microphone; returns immediately. */
     void start() {
         if (!running.compareAndSet(false, true)) {
             return;
@@ -96,7 +103,11 @@ final class OnlineSpeechSession {
                     return;
                 }
                 connected = true;
-                if (!socket.send(VoskJson.config(language, sampleRate))) {
+                audioLog = RecognitionDiagnostics.consumeRequest();
+                // Two messages because the C++ server stops reading a config message
+                // once it has seen sample_rate.
+                if (!socket.send(VoskJson.config(language, sampleRate))
+                        || !socket.send(VoskJson.audioLogConfig(audioLog))) {
                     finishWithError(text(R.string.recognizer_config_failed));
                     return;
                 }
@@ -125,11 +136,7 @@ final class OnlineSpeechSession {
                     post(() -> listener.onResult(result));
                 }
                 if (!result.partial && !result.text.isEmpty()) {
-                    running.set(false);
-                    connected = false;
-                    stopRecorder();
-                    mainHandler.removeCallbacks(finalResultTimeout);
-                    audioExecutor.shutdownNow();
+                    release();
                     post(() -> listener.onResult(result));
                     socket.close(1000, "final result received");
                     finishComplete();
@@ -137,9 +144,13 @@ final class OnlineSpeechSession {
             }
 
             @Override
+            public void onClosing(WebSocket socket, int code, String reason) {
+                // Without this the socket stays half open and onClosed() never arrives.
+                socket.close(1000, null);
+            }
+
+            @Override
             public void onClosed(WebSocket socket, int code, String reason) {
-                connected = false;
-                running.set(false);
                 finishComplete();
             }
 
@@ -147,17 +158,13 @@ final class OnlineSpeechSession {
             public void onFailure(WebSocket socket, Throwable t, Response response) {
                 connected = false;
                 if (running.getAndSet(false)) {
-                    finishWithError(t.getMessage() == null
-                            ? text(R.string.recognizer_connection_failed) : t.getMessage());
+                    finishWithError(text(connectionError(t, response == null ? 0 : response.code())));
                 }
             }
         });
     }
 
-    /**
-     * Stops capture and requests a final result with EOF, keeping the socket open to receive it.
-     * Stopping before connection completes instead finishes without recording.
-     */
+    /** Stops recording and waits for the server's final result. */
     void stop() {
         if (!running.get() || !stopping.compareAndSet(false, true)) {
             return;
@@ -183,23 +190,20 @@ final class OnlineSpeechSession {
     }
 
     /**
-     * Aborts without requesting a final result or posting a terminal callback.
-     * Already queued listener calls can still run; owners must ignore obsolete sessions.
+     * Aborts without a final result or terminal callback. Listener calls that are
+     * already queued on the main thread still run, so owners have to ignore them.
      */
     void cancel() {
         terminalCallbackSent.set(true);
-        running.set(false);
-        connected = false;
-        mainHandler.removeCallbacks(finalResultTimeout);
-        stopRecorder();
+        release();
         WebSocket socket = webSocket;
         if (socket != null) {
             socket.cancel();
         }
-        audioExecutor.shutdownNow();
     }
 
-    /** The worker owns recorder release; other threads only stop it to unblock reads. */
+    // Only the audio thread releases the recorder. Other threads just stop it,
+    // which unblocks the pending read().
     private void startAudioLoop(WebSocket socket) {
         try {
             audioExecutor.execute(() -> {
@@ -253,7 +257,6 @@ final class OnlineSpeechSession {
                 }
                 recorder = localRecorder;
                 int frameBytes = sampleRate * 2 * AUDIO_FRAME_DURATION_MS / 1000;
-                // Frames are transport batches of PCM16 audio, not separate transcription chunks.
                 byte[] buffer = new byte[Math.min(bufferSize, frameBytes)];
                 try {
                     if (!running.get() || stopping.get()) {
@@ -269,6 +272,7 @@ final class OnlineSpeechSession {
                         return;
                     }
                     post(listener::onSpeechStart);
+                    boolean logged = false;
                     while (running.get() && connected && !stopping.get()) {
                         int read = localRecorder.read(buffer, 0, buffer.length);
                         if (read > 0) {
@@ -281,12 +285,18 @@ final class OnlineSpeechSession {
                                 finishWithError(text(R.string.recognizer_audio_closed));
                                 break;
                             }
+                            if (audioLog && !logged) {
+                                RecognitionDiagnostics.record(context, serverUrl, language, sampleRate);
+                                logged = true;
+                            }
+                        } else if (read < 0 && running.get() && !stopping.get()) {
+                            finishWithError(text(R.string.recognizer_capture_failed));
+                            break;
                         }
                     }
                 } catch (RuntimeException e) {
                     if (running.get()) {
-                        finishWithError(e.getMessage() == null
-                                ? text(R.string.recognizer_capture_failed) : e.getMessage());
+                        finishWithError(text(R.string.recognizer_capture_failed));
                     }
                 } finally {
                     try {
@@ -303,7 +313,7 @@ final class OnlineSpeechSession {
                 }
             });
         } catch (RejectedExecutionException ignored) {
-            // A user stop can race with the WebSocket opening.
+            // Stopped while the socket was still opening.
         }
     }
 
@@ -318,54 +328,57 @@ final class OnlineSpeechSession {
         mainHandler.post(runnable);
     }
 
-    private void finishWithError(String message) {
+    private void release() {
         running.set(false);
         connected = false;
         stopRecorder();
+        mainHandler.removeCallbacks(finalResultTimeout);
+        audioExecutor.shutdownNow();
+    }
+
+    private void finishWithError(String message) {
+        release();
         WebSocket socket = webSocket;
         webSocket = null;
         if (socket != null) {
             socket.cancel();
         }
-        audioExecutor.shutdownNow();
-        mainHandler.removeCallbacks(finalResultTimeout);
         if (terminalCallbackSent.compareAndSet(false, true)) {
-            mainHandler.post(() -> listener.onError(message));
+            post(() -> listener.onError(message));
         }
     }
 
     private void finishComplete() {
-        stopRecorder();
-        audioExecutor.shutdownNow();
-        mainHandler.removeCallbacks(finalResultTimeout);
+        release();
         if (terminalCallbackSent.compareAndSet(false, true)) {
             post(listener::onComplete);
         }
     }
 
     private void finishNoSpeech(WebSocket socket) {
-        running.set(false);
-        connected = false;
-        stopRecorder();
-        mainHandler.removeCallbacks(finalResultTimeout);
-        audioExecutor.shutdownNow();
+        release();
         socket.close(1000, "no speech detected");
         if (terminalCallbackSent.compareAndSet(false, true)) {
             post(listener::onNoSpeech);
         }
     }
 
-    /** Sends EOF at most once, then bounds how long the backend may take to finish. */
     private void sendEofAndAwaitFinal() {
         if (!eofSent.compareAndSet(false, true)) {
             return;
         }
         WebSocket socket = webSocket;
-        mainHandler.postDelayed(finalResultTimeout, 120_000);
+        mainHandler.postDelayed(finalResultTimeout, FINAL_RESULT_TIMEOUT_MS);
         if (socket == null || !socket.send("{\"eof\": 1}")) {
             finishWithError(text(R.string.recognizer_finish_failed));
-            return;
         }
+    }
+
+    static int connectionError(Throwable error, int status) {
+        if (error instanceof SSLException) return R.string.recognizer_secure_connection_failed;
+        if (status == 401 || status == 403) return R.string.recognizer_access_denied;
+        if (status == 429 || status >= 500) return R.string.recognizer_server_unavailable;
+        return R.string.recognizer_connection_failed;
     }
 
     private void stopRecorder() {

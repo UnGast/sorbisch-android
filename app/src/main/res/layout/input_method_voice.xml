@@ -2,80 +2,118 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#FAFAFA"
+    android:background="@color/keyboard_background"
     android:orientation="vertical"
-    android:padding="8dp">
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp"
+    android:paddingTop="6dp"
+    android:paddingBottom="10dp">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <Spinner
-            android:id="@+id/ime_language"
+        <!-- The chip wraps its label but never pushes the icons off narrow screens. -->
+        <FrameLayout
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:contentDescription="@string/ime_language" />
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <Spinner
+                android:id="@+id/ime_language"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:background="@drawable/bg_chip"
+                android:paddingStart="0dp"
+                android:paddingEnd="28dp"
+                android:contentDescription="@string/ime_language" />
+        </FrameLayout>
 
         <ImageButton
             android:id="@+id/ime_choose_keyboard"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
+            style="@style/KeyboardIcon"
             android:contentDescription="@string/ime_choose_keyboard"
             android:src="@drawable/ic_keyboard" />
 
         <ImageButton
             android:id="@+id/ime_open_settings"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
+            style="@style/KeyboardIcon"
             android:contentDescription="@string/ime_open_app_settings"
-            android:src="@android:drawable/ic_menu_preferences" />
+            android:src="@drawable/ic_settings" />
 
         <ImageButton
             android:id="@+id/ime_hide"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
+            style="@style/KeyboardIcon"
             android:contentDescription="@string/ime_hide_keyboard"
-            android:src="@android:drawable/ic_menu_close_clear_cancel" />
+            android:src="@drawable/ic_expand_more" />
     </LinearLayout>
 
+    <ScrollView
+        android:id="@+id/ime_preview_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="96dp"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/bg_keyboard_preview"
+        android:fillViewport="true">
     <TextView
         android:id="@+id/ime_preview"
         android:layout_width="match_parent"
-        android:layout_height="64dp"
-        android:background="#F0F2F4"
+        android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:maxLines="2"
-        android:paddingHorizontal="12dp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="10dp"
+        android:lineSpacingExtra="2dp"
         android:text="@string/ime_tap_microphone"
+        android:textColor="@color/text_primary"
         android:textSize="18sp" />
+    </ScrollView>
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="72dp"
-        android:gravity="center"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp">
 
+        <FrameLayout
+            android:layout_width="136dp"
+            android:layout_height="72dp"
+            android:layout_gravity="center">
         <ImageButton
             android:id="@+id/ime_start"
             android:layout_width="72dp"
-            android:layout_height="64dp"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:layout_height="72dp"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_microphone"
+            android:tint="@color/microphone_icon_tint"
+            android:scaleType="center"
             android:contentDescription="@string/ime_start_recognition"
-            android:src="@android:drawable/ic_btn_speak_now" />
+            android:src="@drawable/ic_mic" />
+
+        <ProgressBar
+            android:id="@+id/ime_progress"
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center_vertical|end"
+            android:layout_marginEnd="4dp"
+            android:indeterminateTint="@color/primary"
+            android:importantForAccessibility="no"
+            android:visibility="gone" />
+        </FrameLayout>
 
         <ImageButton
-            android:id="@+id/ime_stop"
-            android:layout_width="72dp"
-            android:layout_height="64dp"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/ime_stop_recognition"
-            android:enabled="false"
-            android:src="@android:drawable/ic_media_pause" />
-    </LinearLayout>
+            android:id="@+id/ime_action"
+            android:layout_width="64dp"
+            android:layout_height="56dp"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/bg_key"
+            android:tint="@color/keyboard_icon_tint"
+            android:scaleType="center"
+            android:contentDescription="@string/ime_enter"
+            android:src="@drawable/ic_keyboard_enter" />
+    </FrameLayout>
 </LinearLayout>

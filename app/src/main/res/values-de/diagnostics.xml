@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="diagnostics_title">Expertenoptionen: Diagnose</string>
+    <string name="diagnostics_arm">Nächstes Diktat auf dem Server aufzeichnen</string>
+    <string name="diagnostics_disarm">Vorgemerkte Diagnoseaufnahme ausschalten</string>
+    <string name="diagnostics_enable">Einmal aktivieren</string>
+    <string name="diagnostics_consent">Mit dieser freiwilligen Funktion bittest du den Sprachserver, dein nächstes Diktat zur Fehlersuche als Audio zu speichern. Bitte verwende dafür einen Testsatz ohne persönliche oder vertrauliche Angaben.\n\nDiktuj kann nicht prüfen, ob und wie lange die Aufnahme auf dem Server gespeichert wird. Du kannst sie hier auch nicht löschen. Auf deinem Gerät wird keine Audiodatei gespeichert.\n\nDie Freigabe gilt einmalig für das nächste Diktat, auch über die Tastatur oder eine andere App. Starte es innerhalb von zehn Minuten. Ein bereits laufendes Diktat ist nicht betroffen. Wird Diktuj vollständig beendet, verfällt die Freigabe.</string>
+    <string name="diagnostics_armed">Serveraufnahme für das nächste Diktat vorgemerkt. Bitte innerhalb von zehn Minuten starten.</string>
+    <string name="diagnostics_email">Liste prüfen und E-Mail vorbereiten</string>
+    <string name="diagnostics_clear">Lokale Liste löschen</string>
+    <string name="diagnostics_clear_confirm">Lokale Liste löschen? Aufnahmen auf dem Server werden dadurch nicht gelöscht.</string>
+    <string name="diagnostics_empty">Die lokale Liste enthält noch keine Diagnosediktate.</string>
+    <string name="diagnostics_no_mail">Keine E-Mail-App verfügbar. Bitte eine E-Mail-App installieren oder aktivieren.</string>
+    <string name="diagnostics_report">Diktuj %1$s: Diagnosediktate\n\nDiese Liste hilft dem Support, deine Testdiktate auf dem Server zu finden. Sie enthält bis zu 50 Einträge mit Zeitpunkt (UTC), Server, Sprache und Abtastrate, aber keine Aufnahmen oder erkannten Texte.\n\nDer Zeitpunkt bezieht sich auf das erste zum Versand vorgemerkte Audiopaket. Für diese Diktate wurde eine Aufnahme auf dem Server angefordert. Ob sie tatsächlich gespeichert wurde, kann Diktuj nicht bestätigen.</string>
+</resources>

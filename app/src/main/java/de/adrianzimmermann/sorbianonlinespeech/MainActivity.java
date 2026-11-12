@@ -1,12 +1,12 @@
 package de.adrianzimmermann.sorbianonlinespeech;
 
 import android.Manifest;
-import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -15,8 +15,10 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-public class MainActivity extends Activity {
+public class MainActivity extends LocalizedActivity {
     private static final int REQ_AUDIO = 10;
+    // Index in R.array.tts_protocol_options.
+    private static final int PROTOCOL_BAMBORAK = 1;
     private EditText serverUrl;
     private EditText ttsText;
     private EditText ttsUrl;
@@ -31,6 +33,7 @@ public class MainActivity extends Activity {
     private Button stopRecognitionButton;
     private OnlineSpeechSession session;
     private TtsPlayer ttsPlayer;
+    private int sessionGeneration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,12 +50,13 @@ public class MainActivity extends Activity {
             }
         });
         setContentView(R.layout.activity_main);
+        findViewById(R.id.advanced_back).setOnClickListener(v -> finish());
         bindViews();
         configureControls();
         loadSettings();
-        if (!isProcessTextIntent(getIntent())
-                && checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, REQ_AUDIO);
+        transcript.setText(SpeechSettings.dictationDraft(this));
+        if (getIntent().getBooleanExtra("show_settings", false) || isProcessTextIntent(getIntent())) {
+            findViewById(R.id.toggle_advanced).performClick();
         }
         handleTtsIntent(getIntent());
     }
@@ -65,6 +69,9 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        sessionGeneration++;
+        if (session != null) session.cancel();
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         if (ttsPlayer != null) {
             ttsPlayer.shutdown();
             ttsPlayer = null;
@@ -93,6 +100,7 @@ public class MainActivity extends Activity {
     }
 
     private void configureControls() {
+        findViewById(R.id.expert_diagnostics).setOnClickListener(v -> RecognitionDiagnostics.show(this));
         recognitionSampleRate.setAdapter(new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item, new String[]{"16 kHz", "48 kHz"}));
         ttsProtocol.setAdapter(ArrayAdapter.createFromResource(this,
@@ -101,34 +109,30 @@ public class MainActivity extends Activity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 findViewById(R.id.tts_speaker_fields).setVisibility(
-                        position == 1 ? View.VISIBLE : View.GONE);
+                        position == PROTOCOL_BAMBORAK ? View.VISIBLE : View.GONE);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
-        View advancedControls = findViewById(R.id.advanced_controls);
-        Button toggleAdvanced = findViewById(R.id.toggle_advanced);
-        toggleAdvanced.setOnClickListener(v -> {
-            boolean show = advancedControls.getVisibility() != View.VISIBLE;
-            advancedControls.setVisibility(show ? View.VISIBLE : View.GONE);
-            toggleAdvanced.setText(show
-                    ? R.string.hide_advanced_settings
-                    : R.string.show_advanced_settings);
-        });
+        findViewById(R.id.toggle_advanced).setOnClickListener(v ->
+                showAdvanced(findViewById(R.id.advanced_controls).getVisibility() != View.VISIBLE));
         String[] languages = SpeechSettings.availableLanguages();
         languageSpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, languages));
         languageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (selectedLanguage().equals(SpeechSettings.language(MainActivity.this))) return;
                 SpeechSettings.saveLanguage(MainActivity.this, selectedLanguage());
+                serverUrl.setText(SpeechSettings.serverUrl(MainActivity.this));
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
+        configureTtsLanguage();
         Button save = findViewById(R.id.save_settings);
         save.setOnClickListener(v -> {
             if (saveSettings()) {
@@ -142,26 +146,24 @@ public class MainActivity extends Activity {
         setRecognitionControls(false);
         Button serviceTest = findViewById(R.id.open_service_test);
         serviceTest.setOnClickListener(v -> startActivity(new Intent(this, ServiceTestActivity.class)));
-        Button imeSettings = findViewById(R.id.open_ime_settings);
-        imeSettings.setOnClickListener(v -> startActivity(
-                new Intent(android.provider.Settings.ACTION_INPUT_METHOD_SETTINGS)));
-        Button imePicker = findViewById(R.id.show_ime_picker);
-        imePicker.setOnClickListener(v -> {
-            InputMethodManager manager = getSystemService(InputMethodManager.class);
-            if (manager != null) {
-                manager.showInputMethodPicker();
-            }
-        });
+        findViewById(R.id.reset_settings).setOnClickListener(v -> new AlertDialog.Builder(this)
+                .setMessage(R.string.reset_settings_confirm)
+                .setPositiveButton(R.string.reset_settings, (dialog, which) -> {
+                    SpeechSettings.resetServerSettings(this);
+                    configureTtsLanguage();
+                    loadSettings();
+                }).setNegativeButton(android.R.string.cancel, null).show());
         Button speakWithEngine = findViewById(R.id.speak_android);
         speakWithEngine.setOnClickListener(v -> {
             if (saveSettings()) {
-                ttsPlayer.speakWithEngine(ttsText.getText().toString(), selectedLanguage());
+                ttsPlayer.speakWithEngine(ttsText.getText().toString(), SpeechSettings.ttsLanguage(this));
             }
         });
         Button speakExternal = findViewById(R.id.speak_external);
         speakExternal.setOnClickListener(v -> {
             if (saveSettings()) {
-                ttsPlayer.speakExternal(ttsText.getText().toString(), selectedLanguage(), ttsUrl.getText().toString());
+                ttsPlayer.speakExternal(ttsText.getText().toString(), SpeechSettings.ttsLanguage(this),
+                        ttsUrl.getText().toString());
             }
         });
         Button stopSpeech = findViewById(R.id.stop_speech);
@@ -169,11 +171,10 @@ public class MainActivity extends Activity {
             ttsPlayer.stop();
             setStatus(getString(R.string.status_speech_stopped));
         });
-        Button ttsSettings = findViewById(R.id.open_tts_settings);
-        ttsSettings.setOnClickListener(v -> openTtsSettings());
+        findViewById(R.id.open_tts_settings).setOnClickListener(v ->
+                HomeActivity.openSettings(this, HomeActivity.ACTION_TTS_SETTINGS));
     }
 
-    /** Starts one direct dictation with the current settings; terminal callbacks re-enable the UI. */
     private void startSession() {
         if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, REQ_AUDIO);
@@ -185,55 +186,62 @@ public class MainActivity extends Activity {
         if (!saveSettings()) {
             return;
         }
-        transcript.setText("");
+        int generation = ++sessionGeneration;
         setRecognitionControls(true);
         OnlineSpeechSession newSession = new OnlineSpeechSession(
                 this, serverUrl.getText().toString(), selectedLanguage(),
                 new RecognitionListener() {
                     @Override
                     public void onReady() {
-                        status.setText(R.string.status_connected);
+                        ifCurrent(generation, () -> status.setText(R.string.status_connected));
                     }
 
                     @Override
                     public void onSpeechStart() {
-                        status.setText(R.string.status_recording);
+                        ifCurrent(generation, () -> status.setText(R.string.status_recording));
                     }
 
                     @Override
                     public void onResult(RecognitionResult result) {
-                        if (result.partial) {
-                            status.setText(getString(R.string.status_partial, result.text));
-                        } else {
-                            transcript.append(result.text + "\n");
-                            status.setText(R.string.status_result_received);
-                        }
+                        ifCurrent(generation, () -> {
+                            transcript.setText(result.text);
+                            SpeechSettings.saveDictationDraft(MainActivity.this, result.text);
+                            if (result.partial) {
+                                status.setText(getString(R.string.status_partial, result.text));
+                            } else {
+                                status.setText(R.string.status_result_received);
+                            }
+                        });
                     }
 
                     @Override
                     public void onNoSpeech() {
-                        status.setText(R.string.status_no_speech);
-                        finishSession();
+                        ifCurrent(generation, () -> finishSession(getString(R.string.status_no_speech)));
                     }
 
                     @Override
                     public void onError(String message) {
-                        status.setText(getString(R.string.status_error, message));
-                        finishSession();
+                        ifCurrent(generation, () -> finishSession(getString(R.string.status_error, message)));
                     }
 
                     @Override
                     public void onComplete() {
-                        status.setText(R.string.status_stopped);
-                        finishSession();
+                        ifCurrent(generation, () -> finishSession(getString(R.string.status_stopped)));
                     }
                 });
         session = newSession;
         newSession.start();
     }
 
-    /** Ends capture but keeps the session until the server finishes or times out. */
+    // Drops callbacks of a session that has been cancelled in the meantime.
+    private void ifCurrent(int generation, Runnable action) {
+        if (generation == sessionGeneration) {
+            action.run();
+        }
+    }
+
     private void stopSession() {
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         OnlineSpeechSession localSession = session;
         if (localSession != null) {
             stopRecognitionButton.setEnabled(false);
@@ -242,12 +250,18 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void finishSession() {
+    private void finishSession(String message) {
+        status.setText(message);
         session = null;
         setRecognitionControls(false);
     }
 
     private void setRecognitionControls(boolean recording) {
+        if (recording) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        } else {
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
         startRecognitionButton.setEnabled(!recording);
         stopRecognitionButton.setEnabled(recording);
     }
@@ -256,10 +270,7 @@ public class MainActivity extends Activity {
         recognitionSampleRate.setSelection(SpeechSettings.sampleRate(this) == 48000 ? 1 : 0);
         continuousRecognition.setChecked(SpeechSettings.continuousRecognition(this));
         serverUrl.setText(SpeechSettings.serverUrl(this));
-        ttsUrl.setText(SpeechSettings.ttsUrl(this));
-        ttsProtocol.setSelection(SpeechSettings.TTS_BAMBORAK.equals(
-                SpeechSettings.ttsProtocol(this)) ? 1 : 0);
-        ttsSpeakerId.setText(SpeechSettings.ttsSpeakerId(this));
+        loadTtsSettings();
         String language = SpeechSettings.language(this);
         for (int i = 0; i < languageSpinner.getCount(); i++) {
             if (languageSpinner.getItemAtPosition(i).equals(language)) {
@@ -269,11 +280,39 @@ public class MainActivity extends Activity {
         }
     }
 
+    private void loadTtsSettings() {
+        ttsUrl.setText(SpeechSettings.ttsUrl(this));
+        ttsProtocol.setSelection(SpeechSettings.TTS_BAMBORAK.equals(SpeechSettings.ttsProtocol(this))
+                ? PROTOCOL_BAMBORAK : 0);
+        ttsSpeakerId.setText(SpeechSettings.ttsSpeakerId(this));
+    }
+
+    private void configureTtsLanguage() {
+        String[] languages = SpeechSettings.availableTtsLanguages();
+        Spinner spinner = findViewById(R.id.tts_language);
+        int visibility = languages.length > 1 ? View.VISIBLE : View.GONE;
+        spinner.setVisibility(visibility);
+        findViewById(R.id.tts_language_label).setVisibility(visibility);
+        LanguageSpinner.bind(spinner, languages, SpeechSettings.ttsLanguage(this), language -> {
+            ttsPlayer.stop();
+            SpeechSettings.saveTtsLanguage(this, language);
+            loadTtsSettings();
+        });
+    }
+
+    private void showAdvanced(boolean show) {
+        findViewById(R.id.advanced_controls).setVisibility(show ? View.VISIBLE : View.GONE);
+        ((Button) findViewById(R.id.toggle_advanced)).setText(
+                show ? R.string.hide_advanced_settings : R.string.show_advanced_settings);
+    }
+
+    private boolean bamborakSelected() {
+        return ttsProtocol.getSelectedItemPosition() == PROTOCOL_BAMBORAK;
+    }
+
     private boolean saveSettings() {
-        if (ttsProtocol.getSelectedItemPosition() == 1
-                && ttsSpeakerId.getText().toString().trim().isEmpty()) {
-            findViewById(R.id.advanced_controls).setVisibility(View.VISIBLE);
-            ((Button) findViewById(R.id.toggle_advanced)).setText(R.string.hide_advanced_settings);
+        if (bamborakSelected() && ttsSpeakerId.getText().toString().trim().isEmpty()) {
+            showAdvanced(true);
             ttsSpeakerId.setError(getString(R.string.tts_speaker_required));
             ttsSpeakerId.requestFocus();
             return false;
@@ -283,13 +322,13 @@ public class MainActivity extends Activity {
                 recognitionSampleRate.getSelectedItemPosition() == 1 ? 48000 : 16000,
                 continuousRecognition.isChecked());
         SpeechSettings.save(this, serverUrl.getText().toString(), selectedLanguage(), ttsUrl.getText().toString());
-        SpeechSettings.saveTtsOptions(this, ttsProtocol.getSelectedItemPosition() == 1
-                ? SpeechSettings.TTS_BAMBORAK : SpeechSettings.TTS_SIMPLE,
+        SpeechSettings.saveTtsOptions(this,
+                bamborakSelected() ? SpeechSettings.TTS_BAMBORAK : SpeechSettings.TTS_SIMPLE,
                 ttsSpeakerId.getText().toString());
         return true;
     }
 
-    /** Reads selected text without allowing the calling app to change server settings. */
+    /** Reads out text another app sent through the "process text" selection menu. */
     private void handleTtsIntent(Intent intent) {
         if (!isProcessTextIntent(intent)) {
             return;
@@ -299,7 +338,8 @@ public class MainActivity extends Activity {
             return;
         }
         ttsText.setText(text);
-        ttsPlayer.speakWithEngine(text, SpeechSettings.language(this));
+        showAdvanced(true);
+        ttsPlayer.speakWithEngine(text, SpeechSettings.ttsLanguage(this));
     }
 
     static boolean isProcessTextIntent(Intent intent) {
@@ -317,16 +357,6 @@ public class MainActivity extends Activity {
     }
 
     private void setStatus(String message) {
-        if (status != null) {
-            status.setText(message);
-        }
-    }
-
-    private void openTtsSettings() {
-        Intent intent = new Intent("com.android.settings.TTS_SETTINGS");
-        if (intent.resolveActivity(getPackageManager()) == null) {
-            intent = new Intent(android.provider.Settings.ACTION_SETTINGS);
-        }
-        startActivity(intent);
+        status.setText(message);
     }
 }

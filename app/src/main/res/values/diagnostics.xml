@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- HSB translation pending; keep the explicit consent text in English meanwhile. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <string name="diagnostics_title">Expert options: diagnostics</string>
+    <string name="diagnostics_arm">Record the next dictation on the server</string>
+    <string name="diagnostics_disarm">Cancel the pending diagnostic recording</string>
+    <string name="diagnostics_enable">Enable once</string>
+    <string name="diagnostics_consent">This optional feature asks the speech server to save audio of your next dictation for troubleshooting. Please use a test sentence without personal or confidential information.\n\nDiktuj cannot check whether the recording is saved on the server or how long it is kept. You cannot delete it here either. No audio file is saved on your device.\n\nPermission applies once, to the next dictation, including through the keyboard or another app. Start it within ten minutes. A dictation already in progress is not affected. Permission expires if Diktuj is fully stopped.</string>
+    <string name="diagnostics_armed">Server recording requested for the next dictation. Start it within ten minutes.</string>
+    <string name="diagnostics_email">Review list and prepare email</string>
+    <string name="diagnostics_clear">Clear local list</string>
+    <string name="diagnostics_clear_confirm">Clear the local list? This does not delete recordings on the server.</string>
+    <string name="diagnostics_empty">No diagnostic dictations have been recorded in the local list.</string>
+    <string name="diagnostics_no_mail">No email app is available. Install or enable an email app to send the list.</string>
+    <string name="diagnostics_report">Diktuj %1$s: diagnostic dictations\n\nThis list helps support find your test dictations on the server. It contains up to 50 entries with the time (UTC), server, language and sample rate, but no recordings or recognized text.\n\nThe time refers to the first audio frame queued for sending. A server recording was requested for these dictations. Diktuj cannot confirm whether it was actually saved.</string>
+</resources>

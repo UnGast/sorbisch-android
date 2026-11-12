@@ -8,7 +8,7 @@ final class RecognitionTranscript {
         this.continuous = continuous;
     }
 
-    /** Returns null for ignored messages; a non-partial result ends the session. */
+    /** Returns null for messages that carry no transcript. */
     RecognitionResult accept(String message, boolean eofSent) {
         RecognitionResult result = VoskJson.parse(message);
         boolean end = eofSent && (VoskJson.isEmptyFinal(message) || VoskJson.isNoSpeech(message));

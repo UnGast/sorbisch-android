@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand blue from the Diktuj logo. -->
+    <color name="primary">#003DA5</color>
+    <color name="primary_container">#E4ECF9</color>
+    <color name="on_primary_container">#0A2C66</color>
+    <color name="background">#F4F6FA</color>
+    <color name="navigation_bar">#141B24</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="outline">#DDE2EA</color>
+    <color name="field_outline">#7A8494</color>
+    <color name="text_primary">#141B24</color>
+    <color name="text_secondary">#4A5563</color>
+    <color name="text_disabled">#7D8794</color>
+    <color name="disabled_container">#E6E9EE</color>
+    <color name="ripple">#29003DA5</color>
+    <color name="recording">#C62828</color>
+    <color name="keyboard_background">#ECEFF4</color>
+    <color name="keyboard_icon">#3B4653</color>
+</resources>

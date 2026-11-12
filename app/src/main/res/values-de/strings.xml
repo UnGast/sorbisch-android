@@ -10,10 +10,10 @@
         <item>Text + Sprache</item>
         <item>Bamborak</item>
     </string-array>
-    <string name="app_name">Sorbisch</string>
-    <string name="service_name">Sorbische Online-Spracherkennung</string>
-    <string name="tts_service_name">Sorbische Online-Sprachausgabe</string>
-    <string name="ime_name">Sorbische Spracheingabe</string>
+    <string name="app_name">Diktuj</string>
+    <string name="service_name">Diktuj-Spracherkennung</string>
+    <string name="tts_service_name">Diktuj</string>
+    <string name="ime_name">Diktuj</string>
     <string name="ime_subtype_hsb">Obersorbische Spracheingabe</string>
     <string name="recognizer_server_url">Serveradresse der Spracherkennung</string>
     <string name="recognition_language">Erkennungssprache</string>
@@ -36,7 +36,7 @@
     <string name="speak_external">TTS-Server direkt testen</string>
     <string name="stop_speech">Stoppen</string>
     <string name="open_tts_settings">Einstellungen der Sprachausgabe</string>
-    <string name="read_selected_text">Mit sorbischer Stimme vorlesen</string>
+    <string name="read_selected_text">Mit Diktuj vorlesen</string>
     <string name="recognition_service_test">Test des Spracherkennungsdienstes</string>
     <string name="start_service_test">Spracherkennung über Dienst starten</string>
     <string name="status_idle">Bereit</string>
@@ -72,17 +72,17 @@
     <string name="tts_finished">Externe Sprachausgabe beendet</string>
     <string name="tts_playback_failed">Wiedergabe der externen Audiodaten fehlgeschlagen</string>
     <string name="tts_playing">Externe Sprachausgabe wird wiedergegeben</string>
-    <string name="recognizer_no_final_result">Die Spracherkennung lieferte kein endgültiges Ergebnis.</string>
-    <string name="recognizer_microphone_missing">Die Mikrofonberechtigung fehlt.</string>
-    <string name="recognizer_url_invalid">Ungültige Serveradresse für die Spracherkennung.</string>
+    <string name="recognizer_no_final_result">Der Server hat nicht rechtzeitig geantwortet. Bitte erneut versuchen. Bereits angezeigter Text bleibt erhalten.</string>
+    <string name="recognizer_microphone_missing">Bitte Diktuj öffnen und den Mikrofonzugriff erlauben.</string>
+    <string name="recognizer_url_invalid">Die Serveradresse ist ungültig. Bitte in den erweiterten Einstellungen prüfen.</string>
     <string name="recognizer_config_failed">Die Konfiguration konnte nicht an die Spracherkennung gesendet werden.</string>
-    <string name="recognizer_connection_failed">Verbindung zur Spracherkennung fehlgeschlagen.</string>
-    <string name="recognizer_audio_unsupported">Dieses Gerät kann kein Mono-Audio mit 16 kHz aufnehmen.</string>
-    <string name="recognizer_microphone_revoked">Die Mikrofonberechtigung wurde entzogen.</string>
-    <string name="recognizer_recorder_failed">Die Audioaufnahme konnte nicht initialisiert werden.</string>
-    <string name="recognizer_connection_slow">Die Verbindung zur Spracherkennung ist für Live-Audio zu langsam.</string>
-    <string name="recognizer_audio_closed">Die Audioverbindung zur Spracherkennung wurde geschlossen.</string>
-    <string name="recognizer_capture_failed">Die Audioaufnahme ist fehlgeschlagen.</string>
+    <string name="recognizer_connection_failed">Keine Verbindung zum Sprachserver. Bitte Internetverbindung prüfen und erneut versuchen. Falls das Problem bleibt, Serveradresse prüfen.</string>
+    <string name="recognizer_audio_unsupported">Das Gerät unterstützt diese Aufnahme-Einstellung nicht. Bitte in den erweiterten Einstellungen eine andere Abtastrate wählen.</string>
+    <string name="recognizer_microphone_revoked">Der Mikrofonzugriff wurde entzogen. Bitte in den Android-App-Einstellungen wieder erlauben.</string>
+    <string name="recognizer_recorder_failed">Das Mikrofon konnte nicht gestartet werden. Bitte andere Aufnahme-Apps schließen und erneut versuchen.</string>
+    <string name="recognizer_connection_slow">Die Verbindung ist zu langsam. Bitte eine stabilere Internetverbindung verwenden und erneut versuchen.</string>
+    <string name="recognizer_audio_closed">Die Verbindung wurde unterbrochen. Bitte Internetverbindung prüfen und erneut versuchen.</string>
+    <string name="recognizer_capture_failed">Die Mikrofonaufnahme wurde unterbrochen. Bitte Mikrofonzugriff prüfen und erneut versuchen.</string>
     <string name="recognizer_finish_failed">Die Erkennungsanfrage konnte nicht abgeschlossen werden.</string>
     <string name="ime_language">Sprache der Spracherkennung</string>
     <string name="ime_open_app_settings">Servereinstellungen öffnen</string>
@@ -92,11 +92,10 @@
     <string name="ime_tap_microphone">Zum Diktieren auf das Mikrofon tippen</string>
     <string name="ime_microphone_permission_missing">App öffnen und Mikrofonberechtigung erteilen</string>
     <string name="ime_connecting">Verbindung zur Spracherkennung wird hergestellt...</string>
-    <string name="ime_connected">Verbunden. Jetzt sprechen.</string>
-    <string name="ime_listening">Aufnahme läuft...</string>
-    <string name="ime_finishing">Spracherkennung wird abgeschlossen...</string>
+    <string name="ime_listening">Jetzt sprechen. Zum Beenden auf Stopp tippen.</string>
+    <string name="ime_finishing">Text wird verarbeitet …</string>
     <string name="ime_stopped">Spracheingabe gestoppt</string>
     <string name="ime_no_input_field">Kein aktives Textfeld</string>
-    <string name="ime_inserted">Eingefügt: %1$s</string>
+    <string name="ime_inserted">%1$s\nEingefügt</string>
     <string name="tts_sample_text">Dobry dźeń, witajće!</string>
 </resources>

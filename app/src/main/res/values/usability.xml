@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- HSB translations pending review. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <string name="ime_cancel_connecting">Connecting. Cancel</string>
+    <string name="setup_close_and_use">Close and use Diktuj</string>
+    <string name="setup_main_menu">Go to Diktuj main menu</string>
+    <string name="setup_use_keyboard_help">You can close Diktuj now. To dictate, open a text field in another app and select the Diktuj keyboard. Tap the microphone and wait for the red stop square before speaking. Tap it to finish. Any setup steps still open are listed below.</string>
+    <string name="setup_use_output_help">You can close Diktuj now. Use the accessibility read-aloud shortcut you configured, or an app that uses Android text-to-speech. Any setup steps still open are listed below.</string>
+    <string name="ime_insert_failed">Could not insert the text. Please select the text field again. Your dictation remains visible here.</string>
+    <string name="recognizer_secure_connection_failed">A secure connection could not be established. Check the device date and server address. If it persists, contact the operator.</string>
+    <string name="recognizer_access_denied">The server denied access. Please check the server address or contact the operator.</string>
+    <string name="recognizer_server_unavailable">The server is currently busy or unavailable. Please try again later.</string>
+</resources>

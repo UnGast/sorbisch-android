@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:fillViewport="true" android:fitsSystemWindows="true">
+    <LinearLayout style="@style/Page">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:baselineAligned="false" android:gravity="center_vertical"
+            android:paddingTop="16dp" android:paddingBottom="8dp" tools:ignore="UseCompoundDrawables">
+            <ImageView android:layout_width="48dp" android:layout_height="48dp"
+                android:src="@drawable/ic_launcher" android:importantForAccessibility="no" />
+            <TextView style="@style/AppTitle" android:text="@string/app_name" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/Card" android:layout_marginTop="8dp">
+            <TextView style="@style/FieldLabel" android:paddingTop="0dp" android:labelFor="@+id/app_language"
+                android:text="@string/app_language" />
+            <Spinner android:id="@id/app_language" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:saveEnabled="false" />
+        </LinearLayout>
+
+        <TextView style="@style/SectionLabel" android:text="@string/voice_input_section" />
+        <LinearLayout style="@style/Card.List">
+            <TextView android:id="@+id/setup_status" style="@style/StatusText"
+                android:layout_margin="12dp" android:accessibilityLiveRegion="polite" />
+            <Button android:id="@+id/setup_input" style="@style/Button.Row" android:text="@string/open_ime_settings" />
+            <Button android:id="@+id/select_input" style="@style/Button.Row" android:text="@string/show_ime_picker" />
+            <Button android:id="@+id/show_draft" style="@style/Button.Row" android:text="@string/last_dictation" />
+        </LinearLayout>
+
+        <TextView style="@style/SectionLabel" android:text="@string/voice_output_section" />
+        <LinearLayout style="@style/Card.List">
+            <Button android:id="@+id/setup_read_aloud" style="@style/Button.Row" android:text="@string/setup_read_aloud" />
+            <Button android:id="@+id/select_engine" style="@style/Button.Row" android:text="@string/open_tts_settings" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="16dp">
+                <TextView android:id="@+id/home_tts_language_label" style="@style/FieldLabel" android:paddingTop="0dp"
+                    android:labelFor="@+id/home_tts_language" android:text="@string/tts_language" android:visibility="gone" />
+                <Spinner android:id="@id/home_tts_language" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:layout_marginBottom="16dp" android:visibility="gone" />
+                <TextView android:id="@+id/current_voice" style="@style/BodyText" android:fontFamily="sans-serif-medium" />
+                <Button android:id="@+id/choose_voice" style="@style/Button.Tonal" android:layout_marginTop="12dp" android:text="@string/choose_voice" />
+                <Button android:id="@+id/preview_voice" style="@style/Button.Primary" android:text="@string/preview_voice" />
+                <Button android:id="@+id/stop_preview" style="@style/Button.Tonal" android:text="@string/stop" />
+                <TextView android:id="@+id/home_status" style="@style/SupportingText" android:accessibilityLiveRegion="polite" android:visibility="gone" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout style="@style/Card.List" android:layout_marginTop="28dp">
+            <Button android:id="@+id/reopen_setup" style="@style/Button.Row" android:text="@string/setup_title" />
+            <Button android:id="@+id/open_advanced" style="@style/Button.Row" android:text="@string/advanced_settings" />
+            <Button android:id="@+id/open_privacy" style="@style/Button.Row" android:text="@string/privacy_title" />
+            <Button android:id="@+id/open_imprint" style="@style/Button.Row" android:text="@string/imprint_title" />
+            <Button android:id="@+id/open_licenses" style="@style/Button.Row" android:text="@string/licenses_title" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/setup_scroll"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:fillViewport="true" android:fitsSystemWindows="true">
+    <LinearLayout style="@style/Page" android:paddingTop="24dp">
+        <TextView android:id="@+id/setup_step" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium" android:textSize="14sp" android:textColor="@color/primary" />
+        <ProgressBar android:id="@+id/setup_progress" style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent" android:layout_height="6dp" android:layout_marginTop="10dp"
+            android:progressDrawable="@drawable/progress_steps" android:importantForAccessibility="no" />
+        <TextView android:id="@+id/setup_heading" style="@style/PageTitle" android:layout_marginTop="20dp" />
+        <TextView android:id="@+id/setup_description" style="@style/BodyText" android:paddingTop="4dp" />
+        <LinearLayout android:id="@+id/setup_functions" style="@style/Card" android:layout_marginTop="20dp" android:layout_marginBottom="8dp"
+            android:paddingTop="4dp" android:paddingBottom="4dp">
+            <CheckBox android:id="@+id/setup_use_input" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp" android:text="@string/voice_input_section" />
+            <CheckBox android:id="@+id/setup_use_output" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp" android:text="@string/voice_output_section" />
+        </LinearLayout>
+        <TextView android:id="@+id/setup_language_label" style="@style/FieldLabel" android:paddingTop="20dp" android:labelFor="@+id/setup_language" android:text="@string/recognition_language" />
+        <Spinner android:id="@id/setup_language" android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <TextView android:id="@+id/setup_check" style="@style/StatusText" android:layout_marginTop="20dp" android:accessibilityLiveRegion="polite" />
+        <Button android:id="@+id/setup_action" style="@style/Button.Primary" android:layout_marginTop="20dp" />
+        <Button android:id="@+id/setup_secondary" style="@style/Button.Tonal" />
+        <Button android:id="@+id/setup_input_only" style="@style/Button.Text" android:text="@string/setup_input_only" android:visibility="gone" />
+        <LinearLayout android:id="@+id/setup_tests" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone">
+            <LinearLayout android:id="@+id/setup_input_test" style="@style/Card" android:layout_marginTop="16dp">
+                <TextView style="@style/BodyText" android:text="@string/setup_dictation_test_help" />
+                <EditText android:id="@+id/setup_test_text" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:minHeight="72dp" android:gravity="top|start" android:inputType="textMultiLine" android:importantForAutofill="no" android:hint="@string/setup_test_text_hint" />
+                <Button android:id="@+id/setup_test_keyboard" style="@style/Button.Tonal" android:layout_marginTop="12dp" android:text="@string/show_ime_picker" />
+                <CheckBox android:id="@+id/setup_dictation_ok" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:minHeight="48dp" android:text="@string/setup_dictation_ok" />
+            </LinearLayout>
+            <LinearLayout android:id="@+id/setup_output_test" style="@style/Card" android:layout_marginTop="16dp">
+                <TextView style="@style/BodyText" android:text="@string/setup_speech_test_help" />
+                <Button android:id="@+id/setup_test_speech" style="@style/Button.Primary" android:text="@string/preview_voice" />
+                <Button android:id="@+id/setup_stop_speech" style="@style/Button.Tonal" android:text="@string/stop" />
+                <TextView android:id="@+id/setup_test_status" style="@style/SupportingText" android:accessibilityLiveRegion="polite" />
+                <CheckBox android:id="@+id/setup_speech_ok" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:minHeight="48dp" android:text="@string/setup_speech_ok" />
+            </LinearLayout>
+        </LinearLayout>
+        <Button android:id="@+id/setup_finish_use" style="@style/Button.Primary"
+            android:minHeight="56dp" android:layout_marginTop="24dp"
+            android:text="@string/setup_close_and_use" android:visibility="gone" />
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:baselineAligned="false" android:layout_marginTop="32dp">
+            <Button android:id="@+id/setup_back" style="@style/WeightedButton" android:layout_marginEnd="8dp" android:text="@string/setup_back" />
+            <Button android:id="@+id/setup_next" style="@style/WeightedButton.Primary" android:text="@string/setup_next" />
+        </LinearLayout>
+        <Button android:id="@+id/setup_later" style="@style/Button.Text" android:text="@string/setup_later" />
+    </LinearLayout>
+</ScrollView>

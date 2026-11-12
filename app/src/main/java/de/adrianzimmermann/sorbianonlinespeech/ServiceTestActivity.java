@@ -1,12 +1,11 @@
 package de.adrianzimmermann.sorbianonlinespeech;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Handler;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -16,7 +15,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class ServiceTestActivity extends Activity {
+public class ServiceTestActivity extends LocalizedActivity {
     private static final int REQ_AUDIO = 20;
     private TextView status;
     private TextView transcript;
@@ -102,7 +101,7 @@ public class ServiceTestActivity extends Activity {
         recognizer.startListening(intent);
     }
 
-    /** Cancels rather than requesting a final result; delays destruction to allow cancellation delivery. */
+    // destroy() right after cancel() can drop the cancellation, so wait a moment.
     private void stopRecognizer() {
         SpeechRecognizer localRecognizer = recognizer;
         if (localRecognizer == null) {
@@ -122,5 +121,4 @@ public class ServiceTestActivity extends Activity {
         transcript.append(getString(R.string.transcript_result, kind, results.get(0)) + "\n");
         status.setText(getString(R.string.status_result_received_kind, kind));
     }
-
 }

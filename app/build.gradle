@@ -17,6 +17,8 @@ def config = { key ->
 }
 
 def licenseAssets = layout.buildDirectory.dir("generated/licenseAssets")
+def configVersion = config("configVersion").toInteger()
+if (configVersion < 1) throw new GradleException("configVersion must be positive")
 def prepareLicenseAssets = tasks.register("prepareLicenseAssets", Sync) {
     from(rootProject.projectDir) {
         include "LICENSE", "THIRD_PARTY_NOTICES.md", "third_party/**"
@@ -26,15 +28,16 @@ def prepareLicenseAssets = tasks.register("prepareLicenseAssets", Sync) {
 
 android {
     namespace "de.adrianzimmermann.sorbianonlinespeech"
-    compileSdk 34
+    compileSdk 36
 
     defaultConfig {
-        applicationId "de.adrianzimmermann.sorbianonlinespeech"
-        minSdk 23
-        targetSdk 34
-        versionCode 25
-        versionName "0.7.10"
+        applicationId "de.serbskilud.diktuj"
+        minSdk 24
+        targetSdk 36
+        versionCode 34
+        versionName "0.9.7"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField "int", "CONFIG_VERSION", configVersion.toString()
         buildConfigField "String", "DEFAULT_RECOGNIZER_URL", javaString(config("recognizerUrl"))
         buildConfigField "int", "DEFAULT_RECOGNIZER_SAMPLE_RATE", config("recognizerSampleRate")
         buildConfigField "boolean", "DEFAULT_CONTINUOUS_RECOGNITION", config("continuousRecognition")
@@ -42,6 +45,11 @@ android {
         buildConfigField "String", "DEFAULT_TTS_PROTOCOL", javaString(config("ttsProtocol"))
         buildConfigField "String", "DEFAULT_TTS_SPEAKER_ID", javaString(config("ttsSpeakerId"))
         buildConfigField "String", "SUPPORTED_RECOGNITION_LANGUAGES", javaString(config("recognitionLanguages"))
+        buildConfigField "String", "SUPPORTED_TTS_LANGUAGES", javaString(serverConfig.getProperty("ttsLanguages", "hsb").trim())
+        buildConfigField "String", "DSB_RECOGNIZER_URL", javaString(serverConfig.getProperty("dsbRecognizerUrl", "").trim())
+        buildConfigField "String", "DSB_TTS_URL", javaString(serverConfig.getProperty("dsbTtsUrl", "").trim())
+        buildConfigField "String", "DSB_TTS_PROTOCOL", javaString(serverConfig.getProperty("dsbTtsProtocol", config("ttsProtocol")).trim())
+        buildConfigField "String", "DSB_TTS_SPEAKER_ID", javaString(serverConfig.getProperty("dsbTtsSpeakerId", "").trim())
     }
 
     buildFeatures {

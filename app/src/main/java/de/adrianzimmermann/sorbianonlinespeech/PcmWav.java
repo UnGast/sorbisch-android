@@ -26,7 +26,7 @@ final class PcmWav {
     private PcmWav() {
     }
 
-    /** Accepts uncompressed 16-bit mono/stereo WAV; rejects unsupported or missing audio data. */
+    /** Only uncompressed 16-bit PCM, mono or stereo. */
     static Audio parse(byte[] wav) throws IOException {
         if (wav == null || wav.length < 44 || !tag(wav, 0).equals("RIFF") || !tag(wav, 8).equals("WAVE")) {
             throw new IOException("External TTS must return a PCM WAV file");
@@ -60,7 +60,7 @@ final class PcmWav {
             } else if ("data".equals(chunk)) {
                 audio = Arrays.copyOfRange(wav, dataOffset, dataOffset + size);
             }
-            // RIFF chunks are padded to even byte boundaries, including unrecognized chunks.
+            // Chunks are padded to an even length.
             offset = dataOffset + size + (size & 1);
         }
         if (pcmFormat != 1 || bitsPerSample != 16 || sampleRate <= 0

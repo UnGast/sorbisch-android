@@ -4,6 +4,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <queries>
+        <package android:name="com.google.android.marvin.talkback" />
         <!-- Android's recognition preflight checks the calling app's permission. -->
         <intent>
             <action android:name="android.intent.action.MAIN" />
@@ -15,19 +16,25 @@
     </queries>
 
     <application
-        android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:localeConfig="@xml/locales_config"
         android:usesCleartextTraffic="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".HomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".SetupActivity" android:exported="false" />
+        <activity android:name=".InformationActivity" android:exported="false" />
+        <activity android:name=".MainActivity" android:exported="true">
             <intent-filter android:label="@string/read_selected_text">
                 <action android:name="android.intent.action.PROCESS_TEXT" />
                 <category android:name="android.intent.category.DEFAULT" />
